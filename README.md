@@ -33,3 +33,26 @@ Train four identical networks (same architecture, optimizer, hyperparameters, an
 (4) Leaky ReLU (α=0.01). 
 Record the training loss every 200 iterations for each model. After training, compute and report the final test accuracy for all four versions in a clear table.
 Generate and compare decision boundary contour plots for all four trained models side-by-side
+
+
+week 5:
+
+P5: Implement two feedforward neural networks (M1: 3 hidden layers, M2: 4 hidden layers) from scratch in NumPy on attached obesity_data.csv. Compare performance across loss functions and gradient descent variants using backpropagation.
+NADIA SIDDIQUI
+•
+10 Mar (Edited 10 Mar)
+10 points
+Due 16 Mar
+Models:
+M1: 6 → 64 → 32 → 16 (ReLU) → 4 (softmax)
+M2: 6 → 128 → 64 → 32 → 16 (ReLU) → 4 (softmax)
+Losses (use both per model):
+Mean Squared Error (MSE)
+Categorical Cross-Entropy (CCE)
+Optimizers (use both per model + loss):
+Stochastic GD (batch size = 1)
+Mini-batch GD (batch size = 40)
+Show: 
+Combined loss curves plot (8 runs)
+Test performance table (accuracy + macro precision + macro recall + macro F1)
+Confusion matrix for best model
