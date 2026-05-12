@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Learning OTS — Code Cheat Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --card: #13161e;
+    --border: #1e2330;
+    --accent: #7ee8a2;
+    --accent2: #56cfff;
+    --accent3: #f9a26c;
+    --accent4: #d47fff;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --code-bg: #090b0f;
+    --keyword: #7ee8a2;
+    --string: #f9a26c;
+    --comment: #4a5568;
+    --fn: #56cfff;
+    --num: #d47fff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  header {
+    padding: 36px 40px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+  }
+  header h1 { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: -0.5px; }
+  header span { color: var(--muted); font-size: 13px; }
+  .tag {
+    display: inline-block;
+    background: #1a2a1a;
+    color: var(--accent);
+    border: 1px solid #2a4a2a;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    margin-left: auto;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 20px 60px; }
+  .toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 20px 0 10px;
+  }
+  .toc a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 10px;
+    transition: all 0.15s;
+  }
+  .toc a:hover { color: var(--accent2); border-color: var(--accent2); }
+
+  .section { margin-top: 36px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 24px;
+  }
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: -0.3px;
+  }
+  .section-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    padding-left: 36px;
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .full { grid-column: 1 / -1; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .card-title {
+    padding: 8px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-title.green { color: var(--accent); background: #0e1a10; }
+  .card-title.blue { color: var(--accent2); background: #0a161e; }
+  .card-title.orange { color: var(--accent3); background: #1e160a; }
+  .card-title.purple { color: var(--accent4); background: #160e1e; }
+
+  pre {
+    background: var(--code-bg);
+    padding: 12px 14px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.65;
+  }
+  .kw { color: var(--keyword); }
+  .fn { color: var(--fn); }
+  .st { color: var(--string); }
+  .cm { color: var(--comment); font-style: italic; }
+  .nm { color: var(--num); }
+  .note {
+    background: #0e1218;
+    border-left: 3px solid var(--accent3);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #a0aec0;
+    margin-top: 2px;
+  }
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0 4px;
+  }
+  @media (max-width: 700px) {
+    .grid, .grid-3 { grid-template-columns: 1fr; }
+    header { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>DL Lab — OTS Cheat Sheet</h1>
+  <span>NumPy from scratch · 1 hour exam</span>
+  <span class="tag">P1 → P8</span>
+</header>
+
+<div class="container">
+<div class="toc">
+  <a href="#s1">P1 Perceptron</a>
+  <a href="#s2">P2 MLP Boolean</a>
+  <a href="#s3">P3 Gradient Descent</a>
+  <a href="#s4">P4 NN + Activations</a>
+  <a href="#s5">P5 Multi-class NN</a>
+  <a href="#s6">P6 Optimizers</a>
+  <a href="#s7">P7 Circles</a>
+  <a href="#s8">P8 Regularization</a>
+  <a href="#s9">Building Blocks</a>
+</div>
+
+<!-- =============================== P1 =============================== -->
+<div class="section" id="s1">
+  <div class="section-header">
+    <span class="section-num">P1</span>
+    <span class="section-title">Perceptron (Binary Classification)</span>
+  </div>
+  <p class="section-sub">Key idea: augment X with bias column; update w += y*x when misclassified.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title green">Perceptron Class</div>
+<pre>
+<span class="kw">class</span> <span class="fn">Perceptron</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, epochs=<span class="nm">50</span>):
+        self.epochs = epochs
+
+    <span class="kw">def</span> <span class="fn">fit</span>(self, X, y):
+        <span class="cm"># Prepend 1s for bias</span>
+        X = np.hstack((np.ones((X.shape[<span class="nm">0</span>], <span class="nm">1</span>)), X))
+        self.w = np.random.uniform(-<span class="nm">1</span>, <span class="nm">1</span>, X.shape[<span class="nm">1</span>])
+        <span class="kw">for</span> _ <span class="kw">in</span> range(self.epochs):
+            <span class="kw">for</span> i <span class="kw">in</span> range(len(X)):
+                <span class="kw">if</span> y[i] * np.dot(self.w, X[i]) &lt;= <span class="nm">0</span>:
+                    self.w += y[i] * X[i]  <span class="cm"># update rule</span>
+
+    <span class="kw">def</span> <span class="fn">predict</span>(self, X):
+        X = np.hstack((np.ones((X.shape[<span class="nm">0</span>], <span class="nm">1</span>)), X))
+        <span class="kw">return</span> np.where(X @ self.w >= <span class="nm">0</span>, <span class="nm">1</span>, -<span class="nm">1</span>)
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title blue">Decision Boundary Plot</div>
+<pre>
+<span class="cm"># w0 + w1*x1 + w2*x2 = 0  →  x2 = -(w0+w1*x1)/w2</span>
+w0, w1, w2 = model.w
+x1v = np.linspace(X[:,<span class="nm">0</span>].min()-<span class="nm">1</span>, X[:,<span class="nm">0</span>].max()+<span class="nm">1</span>, <span class="nm">100</span>)
+x2v = -(w0 + w1*x1v) / w2
+
+plt.scatter(X[y==<span class="nm">1</span>][:,<span class="nm">0</span>], X[y==<span class="nm">1</span>][:,<span class="nm">1</span>], label=<span class="st">'Class +1'</span>)
+plt.scatter(X[y==-<span class="nm">1</span>][:,<span class="nm">0</span>], X[y==-<span class="nm">1</span>][:,<span class="nm">1</span>], label=<span class="st">'Class -1'</span>)
+plt.plot(x1v, x2v, <span class="st">'--'</span>, label=<span class="st">'Boundary'</span>)
+plt.legend(); plt.show()
+</pre>
+      <div class="card-title orange" style="margin-top:1px">XOR Network (hardcoded weights)</div>
+<pre>
+<span class="kw">def</span> <span class="fn">step</span>(z): <span class="kw">return</span> <span class="nm">1</span> <span class="kw">if</span> z >= <span class="nm">0</span> <span class="kw">else</span> <span class="nm">0</span>
+
+<span class="kw">def</span> <span class="fn">xor</span>(x):
+    <span class="cm"># OR: weights=[1,1] bias=-0.5</span>
+    or_out  = step(np.dot(x, [<span class="nm">1</span>,<span class="nm">1</span>]) - <span class="nm">0.5</span>)
+    <span class="cm"># NAND: weights=[-1,-1] bias=1.5</span>
+    nand_out= step(np.dot(x, [-<span class="nm">1</span>,-<span class="nm">1</span>]) + <span class="nm">1.5</span>)
+    <span class="cm"># AND those two outputs: weights=[1,1] bias=-1.5</span>
+    <span class="kw">return</span> step(np.dot([or_out,nand_out], [<span class="nm">1</span>,<span class="nm">1</span>]) - <span class="nm">1.5</span>)
+</pre>
+    </div>
+  </div>
+</div>
+
+<!-- =============================== P2 =============================== -->
+<div class="section" id="s2">
+  <div class="section-header">
+    <span class="section-num">P2</span>
+    <span class="section-title">MLP for Boolean Functions</span>
+  </div>
+  <p class="section-sub">Hidden layer = identity matrix (eye(4)). Output perceptron trained on top. Two variants: step threshold vs sigmoid.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title green">Step (Threshold) Perceptron</div>
+<pre>
+<span class="kw">class</span> <span class="fn">StepPerceptron</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self.w = np.random.uniform(-<span class="nm">1</span>, <span class="nm">1</span>, <span class="nm">4</span>)
+        self.b = np.random.uniform(-<span class="nm">1</span>, <span class="nm">1</span>)
+
+    <span class="kw">def</span> <span class="fn">predict</span>(self, x):
+        <span class="kw">return</span> <span class="nm">1</span> <span class="kw">if</span> np.dot(self.w, x) + self.b >= <span class="nm">0</span> <span class="kw">else</span> <span class="nm">0</span>
+
+<span class="kw">def</span> <span class="fn">train_step</span>(truth, epochs=<span class="nm">10</span>):
+    p = StepPerceptron()
+    y = np.array(truth)
+    H = np.eye(<span class="nm">4</span>)          <span class="cm"># hidden outputs</span>
+    <span class="kw">for</span> _ <span class="kw">in</span> range(epochs):
+        <span class="kw">for</span> x, t <span class="kw">in</span> zip(H, y):
+            yh = p.predict(x)
+            <span class="kw">if</span> yh != t:
+                p.w += (t - yh) * x
+                p.b += (t - yh)
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title blue">Sigmoid Perceptron</div>
+<pre>
+<span class="kw">class</span> <span class="fn">SigPerceptron</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self.w = np.random.uniform(-<span class="nm">1</span>, <span class="nm">1</span>, <span class="nm">4</span>)
+        self.b = np.random.uniform(-<span class="nm">1</span>, <span class="nm">1</span>)
+
+    <span class="kw">def</span> <span class="fn">sig</span>(self, z):
+        <span class="kw">return</span> <span class="nm">1</span> / (<span class="nm">1</span> + np.exp(-z))
+
+<span class="kw">def</span> <span class="fn">train_sig</span>(truth, epochs=<span class="nm">10</span>):
+    p = SigPerceptron()
+    y = np.array(truth)
+    H = np.eye(<span class="nm">4</span>)
+    <span class="kw">for</span> _ <span class="kw">in</span> range(epochs):
+        <span class="kw">for</span> x, t <span class="kw">in</span> zip(H, y):
+            yh = p.sig(np.dot(p.w, x) + p.b)
+            p.w += (t - yh) * x  <span class="cm"># always update (no threshold)</span>
+            p.b += (t - yh)
+</pre>
+    </div>
+  </div>
+</div>
+
+<!-- =============================== P3 =============================== -->
+<div class="section" id="s3">
+  <div class="section-header">
+    <span class="section-num">P3</span>
+    <span class="section-title">Gradient Descent on f(x,y)</span>
+  </div>
+  <p class="section-sub">f(x,y) = x² + y² + 10·sin(x) + 10·cos(y) — manually derive ∂f/∂x and ∂f/∂y.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title green">GD Function</div>
+<pre>
+<span class="kw">def</span> <span class="fn">f</span>(x, y):
+    <span class="kw">return</span> x**<span class="nm">2</span> + y**<span class="nm">2</span> + <span class="nm">10</span>*np.sin(x) + <span class="nm">10</span>*np.cos(y)
+
+<span class="kw">def</span> <span class="fn">gradient_descent</span>(x0, y0, lr=<span class="nm">0.05</span>, iters=<span class="nm">100</span>):
+    x, y = float(x0), float(y0)
+    path = [(x, y, f(x, y))]
+    <span class="kw">for</span> _ <span class="kw">in</span> range(iters):
+        dfdx = <span class="nm">2</span>*x + <span class="nm">10</span>*np.cos(x)   <span class="cm"># ∂f/∂x</span>
+        dfdy = <span class="nm">2</span>*y - <span class="nm">10</span>*np.sin(y)   <span class="cm"># ∂f/∂y</span>
+        x -= lr * dfdx
+        y -= lr * dfdy
+        path.append((x, y, f(x, y)))
+    <span class="kw">return</span> np.array(path)   <span class="cm"># shape (iters+1, 3)</span>
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title blue">Contour Plot + Trajectory</div>
+<pre>
+x_v = np.linspace(-<span class="nm">8</span>, <span class="nm">8</span>, <span class="nm">300</span>)
+y_v = np.linspace(-<span class="nm">8</span>, <span class="nm">8</span>, <span class="nm">300</span>)
+X, Y = np.meshgrid(x_v, y_v)
+Z = f(X, Y)
+
+plt.contour(X, Y, Z, levels=<span class="nm">40</span>)
+<span class="kw">for</span> lr <span class="kw">in</span> [<span class="nm">0.01</span>, <span class="nm">0.05</span>, <span class="nm">0.2</span>]:
+    p = gradient_descent(<span class="nm">5</span>, <span class="nm">5</span>, lr)
+    plt.plot(p[:,<span class="nm">0</span>], p[:,<span class="nm">1</span>], label=<span class="st">f'lr=</span>{lr}<span class="st">'</span>)
+plt.legend(); plt.show()
+</pre>
+    </div>
+  </div>
+</div>
+
+<!-- =============================== P4 =============================== -->
+<div class="section" id="s4">
+  <div class="section-header">
+    <span class="section-num">P4</span>
+    <span class="section-title">1-Hidden-Layer NN · make_moons · 4 Activations</span>
+  </div>
+  <p class="section-sub">Architecture: 2→48→1(sigmoid). Loss: Binary Cross-Entropy. Train with mini-batch GD (batch=64, lr=0.01, 10k iters).</p>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title green">Activations + Loss</div>
+<pre>
+<span class="kw">def</span> <span class="fn">sigmoid</span>(x): <span class="kw">return</span> <span class="nm">1</span>/(<span class="nm">1</span>+np.exp(-x))
+
+<span class="kw">def</span> <span class="fn">activate</span>(x, act):
+    <span class="kw">if</span> act==<span class="st">"sigmoid"</span>: <span class="kw">return</span> sigmoid(x)
+    <span class="kw">if</span> act==<span class="st">"tanh"</span>:    <span class="kw">return</span> np.tanh(x)
+    <span class="kw">if</span> act==<span class="st">"relu"</span>:    <span class="kw">return</span> np.maximum(<span class="nm">0</span>,x)
+    <span class="kw">if</span> act==<span class="st">"leaky"</span>:   <span class="kw">return</span> np.where(x><span class="nm">0</span>,x,<span class="nm">0.01</span>*x)
+
+<span class="kw">def</span> <span class="fn">act_deriv</span>(z, act):
+    <span class="kw">if</span> act==<span class="st">"sigmoid"</span>: s=sigmoid(z); <span class="kw">return</span> s*(<span class="nm">1</span>-s)
+    <span class="kw">if</span> act==<span class="st">"tanh"</span>:    <span class="kw">return</span> <span class="nm">1</span>-np.tanh(z)**<span class="nm">2</span>
+    <span class="kw">if</span> act==<span class="st">"relu"</span>:    <span class="kw">return</span> (z><span class="nm">0</span>).astype(float)
+    <span class="kw">if</span> act==<span class="st">"leaky"</span>:
+        d=np.ones_like(z); d[z&lt;<span class="nm">0</span>]=<span class="nm">0.01</span>; <span class="kw">return</span> d
+
+<span class="kw">def</span> <span class="fn">bce</span>(y, yh):
+    eps=<span class="nm">1e-9</span>
+    <span class="kw">return</span> -np.mean(y*np.log(yh+eps)+(1-y)*np.log(1-yh+eps))
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title blue">NN Class (2→48→1)</div>
+<pre>
+<span class="kw">class</span> <span class="fn">NN</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, act=<span class="st">"relu"</span>, lr=<span class="nm">0.01</span>):
+        self.act = act; self.lr = lr
+        np.random.seed(<span class="nm">0</span>)
+        self.W1 = np.random.randn(<span class="nm">2</span>,<span class="nm">48</span>)*<span class="nm">0.1</span>
+        self.b1 = np.zeros((<span class="nm">1</span>,<span class="nm">48</span>))
+        self.W2 = np.random.randn(<span class="nm">48</span>,<span class="nm">1</span>)*<span class="nm">0.1</span>
+        self.b2 = np.zeros((<span class="nm">1</span>,<span class="nm">1</span>))
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, X):
+        self.Z1 = X @ self.W1 + self.b1
+        self.A1 = activate(self.Z1, self.act)
+        self.Z2 = self.A1 @ self.W2 + self.b2
+        self.A2 = sigmoid(self.Z2)
+        <span class="kw">return</span> self.A2
+
+    <span class="kw">def</span> <span class="fn">backward</span>(self, X, y):
+        m = X.shape[<span class="nm">0</span>]
+        dZ2 = self.A2 - y
+        dW2 = self.A1.T @ dZ2 / m
+        db2 = np.sum(dZ2, axis=<span class="nm">0</span>, keepdims=<span class="nm">True</span>) / m
+        dA1 = dZ2 @ self.W2.T
+        dZ1 = dA1 * act_deriv(self.Z1, self.act)
+        dW1 = X.T @ dZ1 / m
+        db1 = np.sum(dZ1, axis=<span class="nm">0</span>, keepdims=<span class="nm">True</span>) / m
+        self.W1 -= self.lr*dW1; self.b1 -= self.lr*db1
+        self.W2 -= self.lr*dW2; self.b2 -= self.lr*db2
+
+    <span class="kw">def</span> <span class="fn">train</span>(self, X, y, iters=<span class="nm">10000</span>, bs=<span class="nm">64</span>):
+        losses = []
+        <span class="kw">for</span> i <span class="kw">in</span> range(iters):
+            idx = np.random.choice(len(X), bs)
+            Xb, yb = X[idx], y[idx]
+            yh = self.forward(Xb)
+            <span class="kw">if</span> i % <span class="nm">200</span> == <span class="nm">0</span>: losses.append(bce(yb, yh))
+            self.backward(Xb, yb)
+        <span class="kw">return</span> losses
+
+    <span class="kw">def</span> <span class="fn">predict</span>(self, X):
+        <span class="kw">return</span> (self.forward(X) > <span class="nm">0.5</span>).astype(int)
+</pre>
+    </div>
+    <div class="card full">
+      <div class="card-title orange">Dataset + Training Loop + Decision Boundary</div>
+<pre>
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> make_moons
+X_train, y_train = make_moons(n_samples=<span class="nm">1500</span>, noise=<span class="nm">0.15</span>, random_state=<span class="nm">42</span>)
+X_test,  y_test  = make_moons(n_samples=<span class="nm">500</span>,  noise=<span class="nm">0.15</span>, random_state=<span class="nm">43</span>)
+y_train = y_train.reshape(-<span class="nm">1</span>,<span class="nm">1</span>); y_test = y_test.reshape(-<span class="nm">1</span>,<span class="nm">1</span>)
+
+<span class="kw">for</span> act <span class="kw">in</span> [<span class="st">"sigmoid"</span>, <span class="st">"tanh"</span>, <span class="st">"relu"</span>, <span class="st">"leaky"</span>]:
+    m = NN(act=act); loss_hist = m.train(X_train, y_train)
+    acc = np.mean(m.predict(X_test) == y_test)
+    print(f<span class="st">"</span>{act}<span class="st">: acc=</span>{acc:.4f}<span class="st">"</span>)
+
+<span class="cm"># Decision boundary helper</span>
+<span class="kw">def</span> <span class="fn">plot_db</span>(model, X, y, ax, title):
+    xx,yy = np.meshgrid(np.linspace(X[:,<span class="nm">0</span>].min()-<span class="nm">.5</span>,X[:,<span class="nm">0</span>].max()+<span class="nm">.5</span>,<span class="nm">200</span>),
+                        np.linspace(X[:,<span class="nm">1</span>].min()-<span class="nm">.5</span>,X[:,<span class="nm">1</span>].max()+<span class="nm">.5</span>,<span class="nm">200</span>))
+    Z = model.predict(np.c_[xx.ravel(),yy.ravel()]).reshape(xx.shape)
+    ax.contourf(xx,yy,Z,alpha=<span class="nm">0.3</span>); ax.scatter(X[:,<span class="nm">0</span>],X[:,<span class="nm">1</span>],c=y.squeeze(),s=<span class="nm">10</span>)
+    ax.set_title(title)
+</pre>
+    </div>
+  </div>
+</div>
+
+<!-- =============================== P5 =============================== -->
+<div class="section" id="s5">
+  <div class="section-header">
+    <span class="section-num">P5</span>
+    <span class="section-title">Multi-class NN · Softmax · MSE &amp; CCE · SGD &amp; MiniBatch</span>
+  </div>
+  <p class="section-sub">M1: [6,64,32,16,4]  M2: [6,128,64,32,16,4]  — ReLU hidden, Softmax output, layer sizes passed as list.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title green">Losses + Softmax</div>
+<pre>
+<span class="kw">def</span> <span class="fn">relu</span>(x):    <span class="kw">return</span> np.maximum(<span class="nm">0</span>,x)
+<span class="kw">def</span> <span class="fn">relu_d</span>(x):  <span class="kw">return</span> (x><span class="nm">0</span>).astype(float)
+
+<span class="kw">def</span> <span class="fn">softmax</span>(x):
+    e = np.exp(x - np.max(x, axis=<span class="nm">1</span>, keepdims=<span class="nm">True</span>))
+    <span class="kw">return</span> e / np.sum(e, axis=<span class="nm">1</span>, keepdims=<span class="nm">True</span>)
+
+<span class="kw">def</span> <span class="fn">mse</span>(y,yh):    <span class="kw">return</span> np.mean((y-yh)**<span class="nm">2</span>)
+<span class="kw">def</span> <span class="fn">mse_grad</span>(y,yh): <span class="kw">return</span> (yh-y)/y.shape[<span class="nm">0</span>]
+
+<span class="kw">def</span> <span class="fn">cce</span>(y,yh):
+    <span class="kw">return</span> -np.mean(np.sum(y*np.log(yh+<span class="nm">1e-9</span>),axis=<span class="nm">1</span>))
+<span class="kw">def</span> <span class="fn">cce_grad</span>(y,yh): <span class="kw">return</span> (yh-y)/y.shape[<span class="nm">0</span>]
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title blue">Generic NN (variable layers)</div>
+<pre>
+<span class="kw">class</span> <span class="fn">NN</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, layers, lr=<span class="nm">0.01</span>):
+        self.W=[]; self.b=[]
+        np.random.seed(<span class="nm">0</span>)
+        <span class="kw">for</span> i <span class="kw">in</span> range(len(layers)-<span class="nm">1</span>):
+            self.W.append(np.random.randn(layers[i],layers[i+<span class="nm">1</span>])*<span class="nm">0.1</span>)
+            self.b.append(np.zeros((<span class="nm">1</span>,layers[i+<span class="nm">1</span>])))
+        self.lr = lr
+
+    <span class="kw">def</span> <span class="fn">forward</span>(self, X):
+        self.Z=[]; self.A=[X]
+        <span class="kw">for</span> i <span class="kw">in</span> range(len(self.W)-<span class="nm">1</span>):     <span class="cm"># hidden: ReLU</span>
+            z = self.A[-<span class="nm">1</span>] @ self.W[i] + self.b[i]
+            self.Z.append(z); self.A.append(relu(z))
+        z = self.A[-<span class="nm">1</span>] @ self.W[-<span class="nm">1</span>] + self.b[-<span class="nm">1</span>]  <span class="cm"># output: softmax</span>
+        self.Z.append(z); self.A.append(softmax(z))
+        <span class="kw">return</span> self.A[-<span class="nm">1</span>]
+
+    <span class="kw">def</span> <span class="fn">backward</span>(self, y, loss_grad):
+        dA = loss_grad
+        <span class="kw">for</span> i <span class="kw">in</span> reversed(range(len(self.W))):
+            dZ = dA <span class="kw">if</span> i==len(self.W)-<span class="nm">1</span> <span class="kw">else</span> dA*relu_d(self.Z[i])
+            self.W[i] -= self.lr * (self.A[i].T @ dZ)
+            self.b[i] -= self.lr * np.sum(dZ, axis=<span class="nm">0</span>, keepdims=<span class="nm">True</span>)
+            dA = dZ @ self.W[i].T
+</pre>
+    </div>
+    <div class="card full">
+      <div class="card-title orange">Train + Evaluate</div>
+<pre>
+<span class="kw">def</span> <span class="fn">train</span>(model, X, y, loss_fn, grad_fn, batch_size, epochs=<span class="nm">100</span>):
+    losses=[]
+    <span class="kw">for</span> _ <span class="kw">in</span> range(epochs):
+        idx = np.random.permutation(len(X))
+        X,y = X[idx], y[idx]
+        <span class="kw">for</span> i <span class="kw">in</span> range(<span class="nm">0</span>,len(X),batch_size):
+            xb,yb = X[i:i+batch_size], y[i:i+batch_size]
+            pred = model.forward(xb)
+            model.backward(yb, grad_fn(yb,pred))
+        losses.append(loss_fn(y, model.forward(X)))
+    <span class="kw">return</span> losses
+
+<span class="cm"># Data prep</span>
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> LabelEncoder, StandardScaler
+X = StandardScaler().fit_transform(X)
+y_onehot = np.eye(<span class="nm">4</span>)[LabelEncoder().fit_transform(y_raw)]
+
+<span class="cm"># Run</span>
+configs = [
+    (<span class="st">"M1"</span>,<span class="st">"MSE"</span>,<span class="st">"SGD"</span>, [<span class="nm">6</span>,<span class="nm">64</span>,<span class="nm">32</span>,<span class="nm">16</span>,<span class="nm">4</span>], mse, mse_grad, <span class="nm">1</span>),
+    (<span class="st">"M1"</span>,<span class="st">"CCE"</span>,<span class="st">"MB"</span>,  [<span class="nm">6</span>,<span class="nm">64</span>,<span class="nm">32</span>,<span class="nm">16</span>,<span class="nm">4</span>], cce, cce_grad, <span class="nm">40</span>),
+    (<span class="st">"M2"</span>,<span class="st">"MSE"</span>,<span class="st">"SGD"</span>, [<span class="nm">6</span>,<span class="nm">128</span>,<span class="nm">64</span>,<span class="nm">32</span>,<span class="nm">16</span>,<span class="nm">4</span>], mse, mse_grad, <span class="nm">1</span>),
+    (<span class="st">"M2"</span>,<span class="st">"CCE"</span>,<span class="st">"MB"</span>,  [<span class="nm">6</span>,<span class="nm">128</span>,<span class="nm">64</span>,<span class="nm">32</span>,<span class="nm">16</span>,<span class="nm">4</span>], cce, cce_grad, <span class="nm">40</span>),
+]
+<span class="kw">for</span> name,loss_name,opt,arch,lf,gf,bs <span class="kw">in</span> configs:
+    model = NN(arch); losses = train(model, X_train, y_train, lf, gf, bs)
+    preds = np.argmax(model.forward(X_test), axis=<span class="nm">1</span>)
+    acc   = np.mean(preds == np.argmax(y_test, axis=<span class="nm">1</span>))
+    print(f<span class="st">"</span>{name}<span class="st">-</span>{loss_name}<span class="st">-</span>{opt}<span class="st">: </span>{acc:.4f}<span class="st">"</span>)
+</pre>
+    </div>
+  </div>
+</div>
+
+<!-- =============================== P6 =============================== -->
+<div class="section" id="s6">
+  <div class="section-header">
+    <span class="section-num">P6</span>
+    <span class="section-title">5 Optimizers from Scratch</span>
+  </div>
+  <p class="section-sub">All use the same forward/backward pass. Differ only in the update rule. Works for any parameter dict.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title green">SGD &amp; Momentum</div>
+<pre>
+<span class="cm"># SGD</span>
+<span class="kw">for</span> k <span class="kw">in</span> params:
+    params[k] -= lr * grads[k]
+
+<span class="cm"># Momentum (init: v={k:0 for k in params})</span>
+beta = <span class="nm">0.9</span>
+<span class="kw">for</span> k <span class="kw">in</span> params:
+    v[k] = beta*v[k] - lr*grads[k]
+    params[k] += v[k]
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title blue">RMSprop &amp; Adagrad</div>
+<pre>
+<span class="cm"># Adagrad (init: s={k:0 for k in params})</span>
+<span class="kw">for</span> k <span class="kw">in</span> params:
+    s[k] += grads[k]**<span class="nm">2</span>
+    params[k] -= lr * grads[k] / (np.sqrt(s[k]) + <span class="nm">1e-8</span>)
+
+<span class="cm"># RMSprop</span>
+beta = <span class="nm">0.9</span>
+<span class="kw">for</span> k <span class="kw">in</span> params:
+    s[k] = beta*s[k] + (<span class="nm">1</span>-beta)*grads[k]**<span class="nm">2</span>
+    params[k] -= lr * grads[k] / (np.sqrt(s[k]) + <span class="nm">1e-8</span>)
+</pre>
+    </div>
+    <div class="card full">
+      <div class="card-title orange">Adam (init: m,v={k:0}, t=1)</div>
+<pre>
+b1,b2,eps = <span class="nm">0.9</span>, <span class="nm">0.999</span>, <span class="nm">1e-8</span>
+<span class="kw">for</span> k <span class="kw">in</span> params:
+    m[k] = b1*m[k] + (<span class="nm">1</span>-b1)*grads[k]
+    v[k] = b2*v[k] + (<span class="nm">1</span>-b2)*grads[k]**<span class="nm">2</span>
+    m_hat = m[k] / (<span class="nm">1</span> - b1**t)   <span class="cm"># bias correction</span>
+    v_hat = v[k] / (<span class="nm">1</span> - b2**t)
+    params[k] -= lr * m_hat / (np.sqrt(v_hat) + eps)
+t += <span class="nm">1</span>
+</pre>
+    </div>
+  </div>
+  <div class="note">💡 Pattern: Create an <code>init_state(opt)</code> that returns the right dict of zeros, then a <code>step(opt, params, grads, state, lr)</code> that applies the rule. Loop over param keys inside.</div>
+</div>
+
+<!-- =============================== P7 =============================== -->
+<div class="section" id="s7">
+  <div class="section-header">
+    <span class="section-num">P7</span>
+    <span class="section-title">make_circles · 2→12→1 · Sigmoid / Tanh / ReLU</span>
+  </div>
+  <p class="section-sub">Same structure as P4 but dataset = make_circles, architecture 2→12→1.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title green">Dataset + Quick NN</div>
+<pre>
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> make_circles
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+
+X, y = make_circles(n_samples=<span class="nm">1000</span>, noise=<span class="nm">0.1</span>)
+y = y.reshape(-<span class="nm">1</span>,<span class="nm">1</span>)
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=<span class="nm">0.25</span>)
+
+<span class="cm"># Reuse NN class from P4 with layers 2→12→1</span>
+<span class="cm"># Just change self.W1=randn(2,12), self.W2=randn(12,1)</span>
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title blue">Compare loss curves</div>
+<pre>
+results = {}
+<span class="kw">for</span> act <span class="kw">in</span> [<span class="st">"sigmoid"</span>, <span class="st">"tanh"</span>, <span class="st">"relu"</span>]:
+    m = NN(act=act, lr=<span class="nm">0.01</span>)
+    losses = m.train(X_train, y_train, iters=<span class="nm">10000</span>)
+    results[act] = losses
+
+plt.figure()
+<span class="kw">for</span> act, loss <span class="kw">in</span> results.items():
+    plt.plot(loss, label=act)
+plt.xlabel(<span class="st">"Checkpoint"</span>); plt.ylabel(<span class="st">"BCE Loss"</span>)
+plt.legend(); plt.title(<span class="st">"Loss Curves"</span>); plt.show()
+</pre>
+    </div>
+  </div>
+</div>
+
+<!-- =============================== P8 =============================== -->
+<div class="section" id="s8">
+  <div class="section-header">
+    <span class="section-num">P8</span>
+    <span class="section-title">Overfitting + Regularization (L1, L2, Dropout)</span>
+  </div>
+  <p class="section-sub">Use a small training set to force overfit, then compare: No_Reg / L1 / L2 / Dropout / combinations.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title green">Forward with Dropout</div>
+<pre>
+<span class="kw">def</span> <span class="fn">forward</span>(X, W1,b1, W2,b2, dropout=<span class="nm">0.0</span>):
+    Z1 = X @ W1 + b1
+    A1 = relu(Z1)
+    mask = <span class="nm">None</span>
+    <span class="kw">if</span> dropout > <span class="nm">0</span>:
+        mask = (np.random.rand(*A1.shape) > dropout) / (<span class="nm">1</span>-dropout)
+        A1 *= mask          <span class="cm"># inverted dropout (scale at train time)</span>
+    Z2 = A1 @ W2 + b2
+    A2 = sigmoid(Z2)
+    <span class="kw">return</span> Z1, A1, Z2, A2, mask
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title blue">Loss with L1 + L2</div>
+<pre>
+<span class="kw">def</span> <span class="fn">compute_loss</span>(y, yh, W1, W2, l1=<span class="nm">0</span>, l2=<span class="nm">0</span>):
+    m = y.shape[<span class="nm">0</span>]
+    bce = -np.mean(y*np.log(yh+<span class="nm">1e-8</span>)+(1-y)*np.log(1-yh+<span class="nm">1e-8</span>))
+    l1_t = l1*(np.sum(np.abs(W1))+np.sum(np.abs(W2)))/m
+    l2_t = l2*(np.sum(W1**<span class="nm">2</span>)+np.sum(W2**<span class="nm">2</span>))/m
+    <span class="kw">return</span> bce + l1_t + l2_t
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title orange">Backward with Reg Gradients</div>
+<pre>
+<span class="kw">def</span> <span class="fn">backward</span>(X,y,Z1,A1,A2,W1,W2,mask,l1=<span class="nm">0</span>,l2=<span class="nm">0</span>):
+    m = X.shape[<span class="nm">0</span>]
+    dZ2 = A2 - y
+    dW2 = (A1.T @ dZ2)/m
+    db2 = np.sum(dZ2,axis=<span class="nm">0</span>,keepdims=<span class="nm">True</span>)/m
+    dA1 = dZ2 @ W2.T
+    <span class="kw">if</span> mask <span class="kw">is not</span> <span class="nm">None</span>: dA1 *= mask   <span class="cm"># apply dropout mask</span>
+    dZ1 = dA1 * relu_d(Z1)
+    dW1 = (X.T @ dZ1)/m
+    db1 = np.sum(dZ1,axis=<span class="nm">0</span>,keepdims=<span class="nm">True</span>)/m
+    <span class="cm"># add reg terms to weight gradients</span>
+    dW2 += (l2*W2 + l1*np.sign(W2))/m
+    dW1 += (l2*W1 + l1*np.sign(W1))/m
+    <span class="kw">return</span> dW1,db1,dW2,db2
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title purple">Compare Variants</div>
+<pre>
+variants = {
+    <span class="st">"No_Reg"</span>:   {<span class="st">"l1"</span>:<span class="nm">0</span>,     <span class="st">"l2"</span>:<span class="nm">0</span>,     <span class="st">"dropout"</span>:<span class="nm">0</span>},
+    <span class="st">"L1"</span>:       {<span class="st">"l1"</span>:<span class="nm">0.001</span>, <span class="st">"l2"</span>:<span class="nm">0</span>,     <span class="st">"dropout"</span>:<span class="nm">0</span>},
+    <span class="st">"L2"</span>:       {<span class="st">"l1"</span>:<span class="nm">0</span>,     <span class="st">"l2"</span>:<span class="nm">0.001</span>, <span class="st">"dropout"</span>:<span class="nm">0</span>},
+    <span class="st">"Dropout"</span>:  {<span class="st">"l1"</span>:<span class="nm">0</span>,     <span class="st">"l2"</span>:<span class="nm">0</span>,     <span class="st">"dropout"</span>:<span class="nm">0.3</span>},
+    <span class="st">"L1+L2"</span>:   {<span class="st">"l1"</span>:<span class="nm">0.001</span>, <span class="st">"l2"</span>:<span class="nm">0.001</span>, <span class="st">"dropout"</span>:<span class="nm">0</span>},
+}
+<span class="kw">for</span> name, p <span class="kw">in</span> variants.items():
+    W1,b1,W2,b2,tl,vl,ta,va = train_model(**p)
+    print(f<span class="st">"</span>{name}<span class="st"> train=</span>{ta[-1]:.3f}<span class="st"> val=</span>{va[-1]:.3f}<span class="st">"</span>)
+</pre>
+    </div>
+  </div>
+</div>
+
+<!-- =============================== BUILDING BLOCKS =============================== -->
+<hr class="divider">
+<div class="section" id="s9">
+  <div class="section-header">
+    <span class="section-num">★</span>
+    <span class="section-title">Universal Building Blocks</span>
+  </div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title green">Data Prep</div>
+<pre>
+<span class="cm"># Normalize</span>
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+sc = StandardScaler()
+X_train = sc.fit_transform(X_train)
+X_test  = sc.transform(X_test)
+
+<span class="cm"># One-hot encode labels</span>
+y_oh = np.eye(n_classes)[y_int]
+
+<span class="cm"># Encode strings to int</span>
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> LabelEncoder
+y_int = LabelEncoder().fit_transform(y_str)
+
+<span class="cm"># Train/test split</span>
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+Xtr,Xte,ytr,yte = train_test_split(X,y,test_size=<span class="nm">0.2</span>)
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title blue">Weight Init Pattern</div>
+<pre>
+<span class="cm"># Single hidden layer</span>
+np.random.seed(<span class="nm">42</span>)
+W1 = np.random.randn(n_in, n_hid) * <span class="nm">0.1</span>
+b1 = np.zeros((<span class="nm">1</span>, n_hid))
+W2 = np.random.randn(n_hid, n_out) * <span class="nm">0.1</span>
+b2 = np.zeros((<span class="nm">1</span>, n_out))
+
+<span class="cm"># Variable depth (list of sizes)</span>
+W, b = [], []
+<span class="kw">for</span> i <span class="kw">in</span> range(len(layers)-<span class="nm">1</span>):
+    W.append(np.random.randn(layers[i],layers[i+<span class="nm">1</span>])*<span class="nm">0.1</span>)
+    b.append(np.zeros((<span class="nm">1</span>,layers[i+<span class="nm">1</span>])))
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title orange">Metrics from Scratch</div>
+<pre>
+<span class="cm"># Accuracy</span>
+acc = np.mean(y_pred == y_true)
+
+<span class="cm"># Macro precision, recall, F1</span>
+<span class="kw">def</span> <span class="fn">macro_metrics</span>(y_true, y_pred):
+    classes = np.unique(y_true)
+    p_list, r_list = [], []
+    <span class="kw">for</span> c <span class="kw">in</span> classes:
+        tp = np.sum((y_pred==c)&(y_true==c))
+        fp = np.sum((y_pred==c)&(y_true!=c))
+        fn = np.sum((y_pred!=c)&(y_true==c))
+        p_list.append(tp/(tp+fp+<span class="nm">1e-9</span>))
+        r_list.append(tp/(tp+fn+<span class="nm">1e-9</span>))
+    p,r = np.mean(p_list), np.mean(r_list)
+    f1  = <span class="nm">2</span>*p*r/(p+r+<span class="nm">1e-9</span>)
+    <span class="kw">return</span> p, r, f1
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title green">Loss Curve Plot</div>
+<pre>
+plt.figure(figsize=(<span class="nm">8</span>,<span class="nm">4</span>))
+plt.plot(train_losses, label=<span class="st">'Train'</span>)
+plt.plot(val_losses,   label=<span class="st">'Val'</span>)
+plt.xlabel(<span class="st">'Epoch'</span>); plt.ylabel(<span class="st">'Loss'</span>)
+plt.title(<span class="st">'Loss Curve'</span>); plt.legend(); plt.show()
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title blue">Confusion Matrix (no sklearn)</div>
+<pre>
+<span class="kw">def</span> <span class="fn">conf_matrix</span>(y_true, y_pred, n):
+    cm = np.zeros((n,n), dtype=int)
+    <span class="kw">for</span> t,p <span class="kw">in</span> zip(y_true, y_pred):
+        cm[t,p] += <span class="nm">1</span>
+    <span class="kw">return</span> cm
+
+<span class="cm"># Quick print</span>
+cm = conf_matrix(y_true, y_pred, n_classes)
+print(cm)
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title orange">Mini-batch Loop Template</div>
+<pre>
+<span class="kw">for</span> epoch <span class="kw">in</span> range(epochs):
+    idx = np.random.permutation(len(X))
+    X, y = X[idx], y[idx]              <span class="cm"># shuffle</span>
+    <span class="kw">for</span> i <span class="kw">in</span> range(<span class="nm">0</span>, len(X), batch_size):
+        Xb = X[i:i+batch_size]
+        yb = y[i:i+batch_size]
+        <span class="cm"># forward → loss → backward → update</span>
+</pre>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:14px">
+    <div class="card">
+      <div class="card-title purple">Backprop Cheat (2-layer, binary)</div>
+<pre>
+<span class="cm"># Forward</span>
+Z1 = X @ W1 + b1        <span class="cm"># (m, hidden)</span>
+A1 = activate(Z1)
+Z2 = A1 @ W2 + b2       <span class="cm"># (m, 1)</span>
+A2 = sigmoid(Z2)        <span class="cm"># output</span>
+
+<span class="cm"># Backward (BCE loss, sigmoid output)</span>
+dZ2 = A2 - y            <span class="cm"># (m, 1)</span>
+dW2 = A1.T @ dZ2 / m
+db2 = np.sum(dZ2, axis=<span class="nm">0</span>, keepdims=<span class="nm">True</span>) / m
+
+dA1 = dZ2 @ W2.T        <span class="cm"># (m, hidden)</span>
+dZ1 = dA1 * act_deriv(Z1)
+dW1 = X.T @ dZ1 / m
+db1 = np.sum(dZ1, axis=<span class="nm">0</span>, keepdims=<span class="nm">True</span>) / m
+
+<span class="cm"># Update</span>
+W1 -= lr*dW1; b1 -= lr*db1
+W2 -= lr*dW2; b2 -= lr*db2
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title green">Key Formulas Quick-Ref</div>
+<pre>
+<span class="cm"># Sigmoid:         1/(1+e^-z)</span>
+<span class="cm"># Sigmoid deriv:   s*(1-s)</span>
+<span class="cm"># Tanh:            np.tanh(z)</span>
+<span class="cm"># Tanh deriv:      1 - tanh(z)²</span>
+<span class="cm"># ReLU:            max(0,z)</span>
+<span class="cm"># ReLU deriv:      (z>0)</span>
+<span class="cm"># Leaky ReLU:      z if z>0 else α*z  (α=0.01)</span>
+<span class="cm"># BCE:            -mean(y*log(yh)+(1-y)*log(1-yh))</span>
+<span class="cm"># CCE:            -mean(sum(y*log(yh), axis=1))</span>
+<span class="cm"># MSE:             mean((y-yh)²)</span>
+<span class="cm"># Softmax:         e^z / sum(e^z)  (subtract max for stability)</span>
+<span class="cm"># L1 grad:        sign(W)</span>
+<span class="cm"># L2 grad:        2*W  (or just W when λ already halved)</span>
+<span class="cm"># Dropout mask:   (rand > p) / (1-p)  — inverted dropout</span>
+</pre>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+</body>
+</html>

@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Learning — Code Explanations</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --card: #ffffff;
+    --border: #e2ddd8;
+    --accent:  #1a6b3c;
+    --accent2: #1a4b8c;
+    --accent3: #8c3a1a;
+    --accent4: #5a1a8c;
+    --text: #1a1a1a;
+    --muted: #6b6560;
+    --code-bg: #1c1917;
+    --kw: #7ee8a2;
+    --fn: #7dd3fc;
+    --st: #fca5a5;
+    --cm: #52524e;
+    --nm: #c4b5fd;
+    --hl-green:  #dcf5e7;
+    --hl-blue:   #dbeafe;
+    --hl-orange: #fef3c7;
+    --hl-red:    #fee2e2;
+    --hl-purple: #ede9fe;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', serif;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+  header {
+    background: var(--code-bg);
+    color: #e2e8f0;
+    padding: 32px 48px 28px;
+    border-bottom: 3px solid var(--accent);
+  }
+  header h1 { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: #7ee8a2; }
+  header p  { font-size: 13px; color: #94a3b8; margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+
+  .toc {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 14px 48px;
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .toc a {
+    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+    text-decoration: none; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 20px; padding: 3px 12px;
+    transition: all 0.15s;
+  }
+  .toc a:hover { color: var(--accent); border-color: var(--accent); }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* SECTION */
+  .section { margin-top: 52px; }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--muted); letter-spacing: 1px; text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+    color: var(--accent2); margin-bottom: 4px; line-height: 1.3;
+  }
+  .section-tagline {
+    font-style: italic; color: var(--muted); font-size: 14px; margin-bottom: 20px;
+    border-left: 3px solid var(--border); padding-left: 12px;
+  }
+
+  /* EXPLANATION BLOCKS */
+  .explain {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .explain h3 {
+    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+    margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .explain p { margin-bottom: 10px; font-size: 14.5px; }
+  .explain p:last-child { margin-bottom: 0; }
+  .explain ul { padding-left: 20px; margin-bottom: 10px; }
+  .explain ul li { font-size: 14px; margin-bottom: 5px; }
+
+  .tag-when  { background: var(--hl-green);  color: var(--accent);  font-family: 'Syne',sans-serif; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; }
+  .tag-how   { background: var(--hl-blue);   color: var(--accent2); font-family: 'Syne',sans-serif; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; }
+  .tag-why   { background: var(--hl-orange); color: var(--accent3); font-family: 'Syne',sans-serif; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; }
+  .tag-warn  { background: var(--hl-red);    color: #991b1b;        font-family: 'Syne',sans-serif; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; }
+  .tag-trick { background: var(--hl-purple); color: var(--accent4); font-family: 'Syne',sans-serif; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; }
+
+  /* CODE INLINE */
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+    background: #f1ede8; padding: 1px 5px; border-radius: 3px; color: #8c3a1a;
+  }
+
+  /* CODE BLOCK */
+  pre {
+    background: var(--code-bg);
+    border-radius: 8px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.65;
+    margin: 12px 0;
+    color: #e2e8f0;
+  }
+  .kw { color: #7ee8a2; }
+  .fn { color: #7dd3fc; }
+  .st { color: #fca5a5; }
+  .cm { color: #52524e; font-style: italic; }
+  .nm { color: #c4b5fd; }
+  .hl { background: #2a2a1a; border-left: 2px solid #fbbf24; padding-left: 6px; display:block; }
+
+  /* ANALOGY BOX */
+  .analogy {
+    background: var(--hl-orange);
+    border-left: 4px solid #f59e0b;
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  .analogy strong { color: var(--accent3); }
+
+  /* FLOW DIAGRAM (text) */
+  .flow {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    background: var(--hl-blue); border-radius: 8px; padding: 12px 16px;
+    color: var(--accent2); line-height: 2;
+  }
+
+  /* KEY-VALUE TABLE */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13.5px; }
+  th { background: var(--code-bg); color: #7ee8a2; font-family: 'JetBrains Mono', monospace;
+       font-size: 11px; padding: 8px 12px; text-align: left; }
+  td { padding: 7px 12px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #faf9f7; }
+
+  hr.divider { border: none; border-top: 2px solid var(--border); margin: 40px 0 0; }
+
+  @media (max-width: 600px) {
+    header { padding: 20px 20px; }
+    .toc { padding: 12px 20px; }
+    .container { padding: 0 14px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Deep Learning Lab — Code Explanations</h1>
+  <p>P1 through P8 · When to use · How it works · Why each piece exists</p>
+</header>
+
+<div class="toc">
+  <a href="#p1">P1 Perceptron</a>
+  <a href="#p2">P2 Boolean MLP</a>
+  <a href="#p3">P3 Gradient Descent</a>
+  <a href="#p4">P4 NN Activations</a>
+  <a href="#p5">P5 Multi-class NN</a>
+  <a href="#p6">P6 Optimizers</a>
+  <a href="#p8">P8 Regularization</a>
+  <a href="#backprop">Backprop Deep Dive</a>
+</div>
+
+<div class="container">
+
+<!-- =========================================================== P1 =========================================================== -->
+<div class="section" id="p1">
+  <div class="section-label">P1 · Week 1</div>
+  <div class="section-title">Perceptron — Binary Classification from Scratch</div>
+  <div class="section-tagline">"The simplest possible learner — a single neuron with a threshold."</div>
+
+  <div class="explain">
+    <h3><span class="tag-when">WHEN</span> Use a Perceptron</h3>
+    <p>Use it when your two classes can be separated by a <strong>straight line</strong> (linearly separable data). It will literally not work — never converge — if the data is not separable (like XOR). Classic use cases: AND gate, OR gate, simple 2D classification.</p>
+    <div class="analogy"><strong>Analogy:</strong> Imagine drawing one straight line between red and blue dots. That's all a perceptron can do.</div>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> The Bias Trick (<code>X_aug</code>)</h3>
+    <p>Instead of writing <code>w·x + b</code> separately, you <strong>stick a column of 1s at the front of X</strong> and make the bias just another weight <code>w[0]</code>. This simplifies the update rule — you only update one vector <code>w</code>.</p>
+<pre>
+X_aug = np.hstack((np.ones((X.shape[<span class="nm">0</span>], <span class="nm">1</span>)), X))
+<span class="cm"># X was shape (n, 2) → X_aug is (n, 3)
+# w[0] is the bias, w[1], w[2] are the real weights</span>
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> The Perceptron Update Rule</h3>
+    <p>The rule is: <strong>if a point is misclassified, push the weight vector toward it (or away from it).</strong></p>
+<pre>
+<span class="cm"># y[i] * dot(w, x) <= 0  means misclassified</span>
+<span class="kw">if</span> y[i] * np.dot(self.w, X[i]) <= <span class="nm">0</span>:
+    self.w += y[i] * X[i]
+<span class="cm"># If y=+1: w += x  (move w closer to x)
+# If y=-1: w -= x  (move w away from x)</span>
+</pre>
+    <div class="analogy"><strong>Why does this work?</strong> The decision boundary is <code>w·x = 0</code> (a line through origin). If a +1 point is on the wrong side, adding its vector to w rotates the boundary toward it. It's geometry, not calculus.</div>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> Decision Boundary Plot</h3>
+    <p>The boundary satisfies <code>w0 + w1·x1 + w2·x2 = 0</code>. Solve for x2: <code>x2 = -(w0 + w1·x1) / w2</code>. Generate x1 values → calculate x2 → plot the line.</p>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> XOR with Perceptron Network (hardcoded)</h3>
+    <p>XOR is <strong>not linearly separable</strong> so one perceptron can't do it. You need 2 layers. The trick: <code>XOR(A,B) = AND(OR(A,B), NAND(A,B))</code>. You hardcode the weights based on the logic.</p>
+    <div class="flow">
+Input (A, B)
+  → OR gate:   weights=[1,1], bias=-0.5   → output if A or B is 1
+  → NAND gate: weights=[-1,-1], bias=1.5  → output if NOT both are 1
+  → AND gate:  weights=[1,1], bias=-1.5   → combine both outputs
+    </div>
+    <p>You use the <code>step function</code> (output 1 if z≥0, else 0) at each gate.</p>
+  </div>
+</div>
+
+<!-- =========================================================== P2 =========================================================== -->
+<div class="section" id="p2">
+  <div class="section-label">P2 · Week 2</div>
+  <div class="section-title">MLP for Boolean Functions — Step vs Sigmoid</div>
+  <div class="section-tagline">"Can a single output neuron learn all 16 Boolean functions when given the right hidden representation?"</div>
+
+  <div class="explain">
+    <h3><span class="tag-when">WHEN</span> Use This Pattern</h3>
+    <p>When you want to train a <strong>single output perceptron on top of a fixed hidden layer</strong>. The hidden layer here is <code>np.eye(4)</code> — the identity matrix — which means each input is already perfectly separated (one-hot). The output neuron just learns the right combination.</p>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-why">WHY</span> <code>HIDDEN_OUTPUTS = np.eye(4)</code></h3>
+    <p>This is the clever part. Boolean functions take 2 inputs → 4 combinations: (0,0), (0,1), (1,0), (1,1). Instead of using these directly, the "hidden layer" outputs a 4D one-hot vector for each input — <code>[1,0,0,0]</code>, <code>[0,1,0,0]</code>, etc. This means the output perceptron receives 4 perfectly distinct patterns and only needs to learn which ones to fire for.</p>
+    <div class="analogy"><strong>Analogy:</strong> Instead of teaching someone "if cold AND raining, wear jacket", you give them 4 labeled boxes. They just pick which boxes say YES for the function they're learning.</div>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> Two Variants — Step vs Sigmoid</h3>
+    <table>
+      <tr><th>Feature</th><th>Step (Threshold)</th><th>Sigmoid</th></tr>
+      <tr><td>Output</td><td>Hard 0 or 1</td><td>Soft 0.0–1.0</td></tr>
+      <tr><td>Update condition</td><td>Only when wrong (yh ≠ target)</td><td>Always update (error is always non-zero)</td></tr>
+      <tr><td>Update rule</td><td><code>w += (target - yh) * x</code></td><td>Same formula, but yh is now a probability</td></tr>
+      <tr><td>Convergence</td><td>Stops cleanly when all correct</td><td>Continuously refines toward target</td></tr>
+    </table>
+<pre>
+<span class="cm"># Step: only update if misclassified</span>
+<span class="kw">if</span> yh != target:
+    p.w += (target - yh) * x
+
+<span class="cm"># Sigmoid: always update (gradient is never exactly 0)</span>
+yh = sigmoid(dot(w,x) + b)   <span class="cm"># yh is between 0 and 1</span>
+p.w += (target - yh) * x     <span class="cm"># update every single step</span>
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-warn">NOTE</span> This is NOT backprop</h3>
+    <p>The update rule here looks like gradient descent but it's actually the <strong>Perceptron Learning Algorithm (PLA)</strong> — there's no chain rule, no hidden layer gradients. The hidden layer is frozen. Only the output neuron's weights change.</p>
+  </div>
+</div>
+
+<!-- =========================================================== P3 =========================================================== -->
+<div class="section" id="p3">
+  <div class="section-label">P3 · Week 3</div>
+  <div class="section-title">Gradient Descent — Visualizing the Loss Surface</div>
+  <div class="section-tagline">"Before training any neural network, understand what GD is actually doing to a surface."</div>
+
+  <div class="explain">
+    <h3><span class="tag-when">WHEN</span> Use This</h3>
+    <p>When you need to demonstrate that gradient descent finds a minimum of a function by following the slope downhill. This is the conceptual foundation for all of backprop. Also use this pattern whenever you're asked to minimize a <em>given formula</em> manually.</p>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> The Function and Its Gradients</h3>
+    <p>The function is <code>f(x,y) = x² + y² + 10sin(x) + 10cos(y)</code>. To run gradient descent, you need the partial derivatives — computed by hand:</p>
+<pre>
+<span class="cm"># ∂f/∂x: derivative of x² is 2x, derivative of 10sin(x) is 10cos(x)</span>
+dfdx = <span class="nm">2</span>*x + <span class="nm">10</span>*np.cos(x)
+
+<span class="cm"># ∂f/∂y: derivative of y² is 2y, derivative of 10cos(y) is -10sin(y)</span>
+dfdy = <span class="nm">2</span>*y - <span class="nm">10</span>*np.sin(y)
+
+<span class="cm"># Update: move opposite to gradient</span>
+x -= lr * dfdx
+y -= lr * dfdy
+</pre>
+    <div class="analogy"><strong>Analogy:</strong> You're standing on a hilly terrain blindfolded. You can only feel the slope under your feet. You always step in the steepest downhill direction. That's gradient descent.</div>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> The Path Array</h3>
+    <p>The function returns a numpy array of shape <code>(iters+1, 3)</code> — each row is <code>(x, y, f(x,y))</code>. Then you can plot <code>path[:,0]</code> vs <code>path[:,1]</code> on the contour to see the trajectory, and <code>path[:,2]</code> to see loss decreasing.</p>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-why">WHY</span> Compare Learning Rates</h3>
+    <table>
+      <tr><th>Learning Rate</th><th>Behaviour</th><th>Sign</th></tr>
+      <tr><td>Too small (0.001)</td><td>Takes forever, barely moves</td><td>Bad — slow convergence</td></tr>
+      <tr><td>Just right (0.05)</td><td>Smooth descent to minimum</td><td>Good</td></tr>
+      <tr><td>Too large (0.2+)</td><td>Oscillates, may diverge</td><td>Bad — overshooting</td></tr>
+    </table>
+    <p>Different starting points (initial values) can lead to different local minima because this function is non-convex (it has multiple valleys due to sin/cos).</p>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> Contour vs 3D Plot</h3>
+<pre>
+<span class="cm"># Contour (top-down view) — best for trajectory</span>
+plt.contour(X, Y, Z, levels=<span class="nm">40</span>)   <span class="cm"># X,Y,Z are meshgrid arrays</span>
+plt.plot(path[:,<span class="nm">0</span>], path[:,<span class="nm">1</span>])   <span class="cm"># overlay the (x,y) path</span>
+
+<span class="cm"># 3D surface — best for showing the "hills and valleys"</span>
+ax = fig.add_subplot(<span class="nm">111</span>, projection=<span class="st">'3d'</span>)
+ax.plot_surface(X, Y, Z, alpha=<span class="nm">0.5</span>)
+ax.plot(xs, ys, zs)  <span class="cm"># 3D path = (x, y, f(x,y))</span>
+</pre>
+  </div>
+</div>
+
+<!-- =========================================================== P4 =========================================================== -->
+<div class="section" id="p4">
+  <div class="section-label">P4 · Week 4</div>
+  <div class="section-title">1-Hidden-Layer NN — 4 Activation Functions Compared</div>
+  <div class="section-tagline">"Same architecture, same data, same training — only the hidden activation changes. Which one wins?"</div>
+
+  <div class="explain">
+    <h3><span class="tag-when">WHEN</span> Use This Architecture</h3>
+    <p>Use a single hidden layer NN for any <strong>binary classification</strong> task. This is the template for P4, P7, and most OTS questions. You pass input through a hidden layer (with the activation you choose), then a sigmoid output layer for probability.</p>
+    <div class="flow">
+Input X (m×2)
+  → Z1 = X @ W1 + b1        (m×48) — linear combination
+  → A1 = activate(Z1)       (m×48) — non-linearity applied
+  → Z2 = A1 @ W2 + b2       (m×1)  — output pre-activation
+  → A2 = sigmoid(Z2)        (m×1)  — probability [0,1]
+    </div>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-why">WHY</span> Each Activation and Its Derivative</h3>
+    <table>
+      <tr><th>Activation</th><th>Formula</th><th>Derivative</th><th>Problem</th></tr>
+      <tr><td>Sigmoid</td><td>1/(1+e⁻ˣ)</td><td>s·(1−s)</td><td>Vanishing gradient for large |x|</td></tr>
+      <tr><td>Tanh</td><td>tanh(x)</td><td>1 − tanh(x)²</td><td>Also vanishes, but zero-centered (better)</td></tr>
+      <tr><td>ReLU</td><td>max(0,x)</td><td>1 if x>0 else 0</td><td>Dying ReLU (dead neurons if always negative)</td></tr>
+      <tr><td>Leaky ReLU</td><td>x if x>0 else 0.01x</td><td>1 if x>0 else 0.01</td><td>Fixes dying ReLU</td></tr>
+    </table>
+    <p>The derivative is used in backprop: <code>dZ1 = dA1 * act_deriv(Z1)</code>. The chain rule says multiply the upstream gradient by how much the activation was "open" at that point.</p>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> Binary Cross-Entropy Loss</h3>
+    <p>Used when output is a probability (sigmoid). Penalises confident wrong predictions very heavily.</p>
+<pre>
+<span class="kw">def</span> <span class="fn">bce</span>(y, yh):
+    eps = <span class="nm">1e-9</span>   <span class="cm"># prevent log(0)</span>
+    <span class="kw">return</span> -np.mean(y*np.log(yh+eps) + (<span class="nm">1</span>-y)*np.log(<span class="nm">1</span>-yh+eps))
+<span class="cm"># If y=1 and yh≈1: log(1)≈0 → small loss ✓
+# If y=1 and yh≈0: log(0)→-∞ → huge loss ✓</span>
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> Mini-batch Training</h3>
+    <p>Instead of computing gradients on all 1500 samples every step (full batch) or 1 sample (SGD), mini-batch uses a random subset of 64 each time. This is faster and adds noise that helps escape local minima.</p>
+<pre>
+<span class="kw">for</span> i <span class="kw">in</span> range(iters):
+    idx = np.random.choice(len(X), batch_size)  <span class="cm"># random 64 indices</span>
+    Xb, yb = X[idx], y[idx]
+    yh = self.forward(Xb)
+    <span class="kw">if</span> i % <span class="nm">200</span> == <span class="nm">0</span>: losses.append(bce(yb, yh))  <span class="cm"># record every 200</span>
+    self.backward(Xb, yb)
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> Decision Boundary Plot</h3>
+    <p>Create a fine grid over the input space → run predictions on every grid point → colour regions by class. Visually shows what the network learned.</p>
+<pre>
+xx, yy = np.meshgrid(np.linspace(xmin, xmax, <span class="nm">200</span>),
+                     np.linspace(ymin, ymax, <span class="nm">200</span>))
+grid = np.c_[xx.ravel(), yy.ravel()]  <span class="cm"># shape (40000, 2)</span>
+Z = model.predict(grid).reshape(xx.shape)
+ax.contourf(xx, yy, Z, alpha=<span class="nm">0.3</span>)    <span class="cm"># coloured regions</span>
+ax.scatter(X[:,<span class="nm">0</span>], X[:,<span class="nm">1</span>], c=y, s=<span class="nm">10</span>) <span class="cm"># actual data points</span>
+</pre>
+  </div>
+</div>
+
+<!-- =========================================================== P5 =========================================================== -->
+<div class="section" id="p5">
+  <div class="section-label">P5 · Week 5</div>
+  <div class="section-title">Multi-class NN — Variable-Depth, Softmax Output</div>
+  <div class="section-tagline">"Go from 2 classes to 4. From hardcoded layers to a list-driven architecture."</div>
+
+  <div class="explain">
+    <h3><span class="tag-when">WHEN</span> Use This Pattern</h3>
+    <p>When you have <strong>more than 2 classes</strong>. The output layer needs softmax (not sigmoid) and the target must be one-hot encoded. The layer sizes are passed as a list so you can change architecture without rewriting the class.</p>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> The Variable-Depth Design</h3>
+    <p>Instead of hardcoding W1, W2, W3 etc., you pass <code>layers=[6,64,32,16,4]</code> and the <code>__init__</code> creates <code>len(layers)-1</code> weight matrices automatically.</p>
+<pre>
+<span class="kw">for</span> i <span class="kw">in</span> range(len(layers)-<span class="nm">1</span>):
+    self.W.append(np.random.randn(layers[i], layers[i+<span class="nm">1</span>]) * <span class="nm">0.1</span>)
+    self.b.append(np.zeros((<span class="nm">1</span>, layers[i+<span class="nm">1</span>])))
+<span class="cm"># layers=[6,64,32,16,4] creates:
+# W[0]: (6,64), W[1]: (64,32), W[2]: (32,16), W[3]: (16,4)</span>
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> Forward Pass for Variable Layers</h3>
+<pre>
+<span class="kw">def</span> <span class="fn">forward</span>(self, X):
+    self.Z = []; self.A = [X]        <span class="cm"># A[0] = input</span>
+    <span class="kw">for</span> i <span class="kw">in</span> range(len(self.W)-<span class="nm">1</span>):   <span class="cm"># all layers except last</span>
+        z = self.A[-<span class="nm">1</span>] @ self.W[i] + self.b[i]
+        self.Z.append(z)
+        self.A.append(relu(z))       <span class="cm"># ReLU for hidden layers</span>
+    z = self.A[-<span class="nm">1</span>] @ self.W[-<span class="nm">1</span>] + self.b[-<span class="nm">1</span>]
+    self.Z.append(z)
+    self.A.append(softmax(z))        <span class="cm"># softmax for output</span>
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> Softmax — What and Why</h3>
+    <p>Converts a vector of raw scores into probabilities that sum to 1. Always subtract the max first to prevent numerical overflow.</p>
+<pre>
+<span class="kw">def</span> <span class="fn">softmax</span>(x):
+    e = np.exp(x - np.max(x, axis=<span class="nm">1</span>, keepdims=<span class="nm">True</span>))  <span class="cm"># stability trick</span>
+    <span class="kw">return</span> e / np.sum(e, axis=<span class="nm">1</span>, keepdims=<span class="nm">True</span>)
+<span class="cm"># Output: [0.1, 0.7, 0.15, 0.05] — probabilities per class</span>
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> Backward Pass (Reversed Loop)</h3>
+    <p>The key insight: the last layer gets <code>dZ = loss_grad</code> directly (softmax+CCE gradient simplifies to <code>yh - y</code>). All hidden layers additionally multiply by the ReLU derivative.</p>
+<pre>
+<span class="kw">for</span> i <span class="kw">in</span> reversed(range(len(self.W))):
+    dZ = dA <span class="kw">if</span> i==len(self.W)-<span class="nm">1</span> <span class="kw">else</span> dA * relu_d(self.Z[i])
+    self.W[i] -= self.lr * (self.A[i].T @ dZ)
+    self.b[i] -= self.lr * np.sum(dZ, axis=<span class="nm">0</span>, keepdims=<span class="nm">True</span>)
+    dA = dZ @ self.W[i].T   <span class="cm"># pass gradient to previous layer</span>
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> MSE vs CCE for Classification</h3>
+    <table>
+      <tr><th>Loss</th><th>Formula</th><th>Gradient</th><th>Best for</th></tr>
+      <tr><td>MSE</td><td>mean((y−yh)²)</td><td>(yh−y)/m</td><td>Regression; works for classification too but slower</td></tr>
+      <tr><td>CCE</td><td>−mean(Σ y·log(yh))</td><td>(yh−y)/m</td><td>Multi-class classification — much faster convergence</td></tr>
+    </table>
+    <p>Both have the same gradient formula here! The difference is in the loss value itself (CCE punishes wrong confident predictions harder) and therefore how the training evolves.</p>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> SGD vs Mini-batch (batch_size parameter)</h3>
+<pre>
+<span class="cm"># batch_size=1 → SGD: one sample at a time, very noisy</span>
+<span class="cm"># batch_size=40 → Mini-batch: 40 samples, smoother gradient</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="nm">0</span>, len(X), batch_size):
+    xb, yb = X[i:i+batch_size], y[i:i+batch_size]
+</pre>
+    <p>The <strong>only</strong> difference between SGD and mini-batch in this code is the batch_size value. No other code changes.</p>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> Data Preprocessing for CSV</h3>
+<pre>
+<span class="cm"># 1. Read CSV</span>
+df = pd.read_csv(<span class="st">"obesity_data.csv"</span>)
+
+<span class="cm"># 2. Encode string columns (Gender: Male/Female → 0/1)</span>
+X[<span class="st">'Gender'</span>] = LabelEncoder().fit_transform(X[<span class="st">'Gender'</span>])
+
+<span class="cm"># 3. Encode target labels to integers</span>
+y_int = LabelEncoder().fit_transform(y_strings)
+
+<span class="cm"># 4. One-hot encode target (4 classes → 4-element vectors)</span>
+y_oh = np.eye(<span class="nm">4</span>)[y_int]   <span class="cm"># shape (n, 4)</span>
+
+<span class="cm"># 5. Normalize features (mean=0, std=1)</span>
+X = StandardScaler().fit_transform(X)
+</pre>
+  </div>
+</div>
+
+<!-- =========================================================== P6 =========================================================== -->
+<div class="section" id="p6">
+  <div class="section-label">P6 · Week 6</div>
+  <div class="section-title">5 Optimizers — SGD, Momentum, RMSprop, Adam, Adagrad</div>
+  <div class="section-tagline">"All optimizers agree on the gradient. They only disagree on how to use it."</div>
+
+  <div class="explain">
+    <h3><span class="tag-when">WHEN</span> Use Each Optimizer</h3>
+    <table>
+      <tr><th>Optimizer</th><th>Use When</th><th>Weakness</th></tr>
+      <tr><td>SGD</td><td>Baseline; simple problems</td><td>Slow, gets stuck in saddle points</td></tr>
+      <tr><td>Momentum</td><td>SGD is too slow or oscillating</td><td>Can overshoot</td></tr>
+      <tr><td>Adagrad</td><td>Sparse features (NLP)</td><td>Learning rate shrinks to 0 over time</td></tr>
+      <tr><td>RMSprop</td><td>RNNs, non-stationary problems</td><td>No bias correction</td></tr>
+      <tr><td>Adam</td><td>Default choice for most problems</td><td>Can overfit; needs lower lr</td></tr>
+    </table>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> The State Pattern</h3>
+    <p>Each optimizer needs memory (velocity, running averages). You create a state dictionary with zeros before training, then pass it to the step function each iteration so it can update and remember.</p>
+<pre>
+<span class="cm"># Before training loop:</span>
+state = init_state(opt, params)   <span class="cm"># e.g. {"v": {k:0}} for Momentum</span>
+
+<span class="cm"># Inside loop:</span>
+params, state = step(opt, params, grads, state, lr)
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> SGD — Simplest</h3>
+<pre>
+<span class="cm"># No state needed. Just subtract scaled gradient.</span>
+w -= lr * grad
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> Momentum — Add Inertia</h3>
+    <p>Keeps a <strong>velocity</strong> vector. Accumulates gradients over time so it keeps moving in a consistent direction (like a ball rolling downhill gaining speed).</p>
+<pre>
+<span class="cm"># State: v = 0 initially</span>
+v = beta * v - lr * grad   <span class="cm"># beta=0.9: keep 90% of old velocity</span>
+w += v
+<span class="cm"># If grad keeps pointing same direction → v grows → faster descent
+# If grad reverses → v slows → dampens oscillations</span>
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> Adagrad — Per-Parameter Learning Rates</h3>
+    <p>Accumulates the <strong>sum of squared gradients</strong>. Parameters that received large gradients get a smaller effective lr. Good for sparse data where some features rarely update.</p>
+<pre>
+<span class="cm"># State: s = 0 initially (accumulated squared gradients)</span>
+s += grad**<span class="nm">2</span>                       <span class="cm"># s only ever grows</span>
+w -= lr * grad / (sqrt(s) + eps)   <span class="cm"># big s → small step</span>
+<span class="cm"># Problem: s never shrinks, so lr → 0 eventually</span>
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> RMSprop — Fix Adagrad's Problem</h3>
+    <p>Instead of accumulating all past gradients, uses an <strong>exponential moving average</strong>. Old gradients decay, recent ones matter more.</p>
+<pre>
+<span class="cm"># State: s = 0 initially</span>
+s = beta*s + (<span class="nm">1</span>-beta)*grad**<span class="nm">2</span>      <span class="cm"># beta=0.9: weighted avg</span>
+w -= lr * grad / (sqrt(s) + eps)   <span class="cm"># s stays relevant, doesn't collapse</span>
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> Adam — Best of Both Worlds</h3>
+    <p>Combines <strong>Momentum</strong> (1st moment = running mean of gradient) and <strong>RMSprop</strong> (2nd moment = running mean of squared gradient). Adds bias correction because m and v start at 0 (biased toward zero at start).</p>
+<pre>
+<span class="cm"># State: m=0, v=0, t=1</span>
+m = b1*m + (<span class="nm">1</span>-b1)*grad           <span class="cm"># 1st moment (like momentum)</span>
+v = b2*v + (<span class="nm">1</span>-b2)*grad**<span class="nm">2</span>       <span class="cm"># 2nd moment (like RMSprop)</span>
+
+m_hat = m / (<span class="nm">1</span> - b1**t)          <span class="cm"># bias correction (t=step count)</span>
+v_hat = v / (<span class="nm">1</span> - b2**t)
+
+w -= lr * m_hat / (sqrt(v_hat) + eps)
+t += <span class="nm">1</span>
+
+<span class="cm"># b1=0.9, b2=0.999, eps=1e-8 are standard hyperparameters</span>
+</pre>
+    <div class="analogy"><strong>Why bias correction?</strong> At step 1, m = 0.9×0 + 0.1×grad = 0.1×grad. This underestimates the true mean. Dividing by (1−0.9¹) = 0.1 corrects it back to grad. As t increases, (1−b1^t) → 1 so correction fades.</div>
+  </div>
+</div>
+
+<!-- =========================================================== P8 =========================================================== -->
+<div class="section" id="p8">
+  <div class="section-label">P8 · Week 8</div>
+  <div class="section-title">Overfitting + Regularization (L1, L2, Dropout)</div>
+  <div class="section-tagline">"A model that memorises the training data is useless. Regularization teaches it to generalise."</div>
+
+  <div class="explain">
+    <h3><span class="tag-when">WHEN</span> You See Overfitting</h3>
+    <p>Train accuracy → 99%, validation accuracy → 60%. Training loss keeps falling, validation loss starts rising. This is overfitting — the model is memorising noise, not learning patterns.</p>
+    <p>In P8, overfitting is deliberately forced by using a very small training set (<code>test_size=0.8</code> means only 20% is used for training).</p>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> Dropout (Inverted Dropout)</h3>
+    <p>Randomly zero out neurons during training. Forces the network to not rely on any one path. At test time, dropout is OFF (rate=0), so all neurons contribute.</p>
+<pre>
+<span class="cm"># Training forward pass</span>
+<span class="kw">if</span> dropout > <span class="nm">0</span>:
+    mask = (np.random.rand(*A1.shape) > dropout) / (<span class="nm">1</span>-dropout)
+    <span class="cm"># random.rand > 0.3 → ~70% of neurons survive (rate=0.3)</span>
+    <span class="cm"># divide by (1-rate) → "inverted dropout" scales up survivors
+    #   so the expected value of A1 stays the same at test time</span>
+    A1 *= mask    <span class="cm"># zero out the dropped neurons</span>
+
+<span class="cm"># Testing forward pass (dropout=0, no mask applied)</span>
+_, _, _, y_prob, _ = forward(X_test, W1, b1, W2, b2, <span class="nm">0</span>)
+</pre>
+    <p>In backward, you must apply the <strong>same mask</strong> to <code>dA1</code> — only the neurons that were active in forward pass should receive gradients.</p>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> L2 Regularization (Weight Decay)</h3>
+    <p>Adds a penalty to the loss equal to the sum of squared weights. This discourages large weights, forcing the model to spread weight evenly rather than rely on a few features.</p>
+<pre>
+<span class="cm"># In loss:</span>
+l2_term = l2 * (np.sum(W1**<span class="nm">2</span>) + np.sum(W2**<span class="nm">2</span>)) / m
+loss = bce + l2_term
+
+<span class="cm"># In backward (extra term added to dW):</span>
+dW2 += (l2 * W2) / m   <span class="cm"># gradient of W² is 2W, but 2 is absorbed in l2 value</span>
+<span class="cm"># Effect: weights are pulled toward 0 every step (weight decay)</span>
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> L1 Regularization (Sparsity)</h3>
+    <p>Adds penalty equal to sum of <strong>absolute values</strong> of weights. Encourages weights to become exactly 0 (sparse). Good when you suspect many features are irrelevant.</p>
+<pre>
+<span class="cm"># In loss:</span>
+l1_term = l1 * (np.sum(np.abs(W1)) + np.sum(np.abs(W2))) / m
+
+<span class="cm"># In backward:</span>
+dW2 += (l1 * np.sign(W2)) / m   <span class="cm"># gradient of |W| is sign(W)</span>
+<span class="cm"># sign(W) = +1 if W>0, -1 if W<0 → always pushes W toward 0</span>
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-why">WHY</span> L1 vs L2 vs Dropout</h3>
+    <table>
+      <tr><th>Method</th><th>Effect on Weights</th><th>When to Use</th></tr>
+      <tr><td>L2</td><td>Shrinks all weights smoothly toward 0; none become exactly 0</td><td>Default choice; works almost everywhere</td></tr>
+      <tr><td>L1</td><td>Forces many weights to exactly 0 (sparse model)</td><td>Feature selection; when you want to ignore irrelevant inputs</td></tr>
+      <tr><td>Dropout</td><td>Doesn't change weight magnitudes; disrupts co-adaptation of neurons</td><td>Deep networks; especially with large hidden layers</td></tr>
+    </table>
+    <div class="analogy"><strong>Analogy:</strong> L2 = give everyone on the team a small pay cut. L1 = fire the least useful people entirely. Dropout = randomly remove people each day so nobody becomes irreplaceable.</div>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> The <code>train_model(l1, l2, dropout)</code> Pattern</h3>
+    <p>The entire training loop is wrapped in a function that accepts regularization hyperparameters. This makes it trivial to run all 8 variants by just calling it with different arguments.</p>
+<pre>
+variants = {
+    <span class="st">"No_Reg"</span>:  {<span class="st">"l1"</span>:<span class="nm">0</span>,     <span class="st">"l2"</span>:<span class="nm">0</span>,     <span class="st">"dropout"</span>:<span class="nm">0</span>  },
+    <span class="st">"L1"</span>:      {<span class="st">"l1"</span>:<span class="nm">0.001</span>, <span class="st">"l2"</span>:<span class="nm">0</span>,     <span class="st">"dropout"</span>:<span class="nm">0</span>  },
+    <span class="st">"L2"</span>:      {<span class="st">"l1"</span>:<span class="nm">0</span>,     <span class="st">"l2"</span>:<span class="nm">0.001</span>, <span class="st">"dropout"</span>:<span class="nm">0</span>  },
+    <span class="st">"Dropout"</span>: {<span class="st">"l1"</span>:<span class="nm">0</span>,     <span class="st">"l2"</span>:<span class="nm">0</span>,     <span class="st">"dropout"</span>:<span class="nm">0.3</span>},
+}
+<span class="kw">for</span> name, p <span class="kw">in</span> variants.items():
+    W1,b1,W2,b2,tl,vl,ta,va = train_model(**p)
+</pre>
+  </div>
+</div>
+
+<!-- =========================================================== BACKPROP =========================================================== -->
+<hr class="divider">
+<div class="section" id="backprop">
+  <div class="section-label">Core Concept</div>
+  <div class="section-title">Backpropagation — The Full Mental Model</div>
+  <div class="section-tagline">"If you understand this once, every P4–P8 backward pass writes itself."</div>
+
+  <div class="explain">
+    <h3><span class="tag-why">THE BIG PICTURE</span></h3>
+    <p>Forward pass computes a prediction and a loss. Backward pass asks: <em>"how much did each weight contribute to that loss?"</em> That answer is the gradient, computed via the chain rule — working backwards through every operation.</p>
+    <div class="flow">
+FORWARD: X → Z1 → A1 → Z2 → A2 → Loss
+BACKWARD: dLoss → dZ2 → dW2,db2 → dA1 → dZ1 → dW1,db1
+    </div>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-how">HOW</span> Each Step and Why</h3>
+<pre>
+<span class="cm">## FORWARD ##</span>
+Z1 = X @ W1 + b1       <span class="cm"># linear: each neuron computes weighted sum</span>
+A1 = activate(Z1)      <span class="cm"># non-linear: squash through activation</span>
+Z2 = A1 @ W2 + b2      <span class="cm"># output layer linear</span>
+A2 = sigmoid(Z2)       <span class="cm"># output probability</span>
+
+<span class="cm">## BACKWARD (binary classification, BCE loss) ##</span>
+dZ2 = A2 - y           <span class="cm"># gradient of BCE+sigmoid simplifies to this!</span>
+                       <span class="cm"># (this is the beautiful simplification)</span>
+
+dW2 = A1.T @ dZ2 / m  <span class="cm"># how much W2 contributed to loss</span>
+db2 = sum(dZ2) / m    <span class="cm"># how much b2 contributed</span>
+
+dA1 = dZ2 @ W2.T      <span class="cm"># backprop error signal to hidden layer</span>
+dZ1 = dA1 * act'(Z1)  <span class="cm"># chain rule: multiply by activation derivative</span>
+                       <span class="cm"># act'(Z1) "gates" how much gradient passes through</span>
+dW1 = X.T @ dZ1 / m  
+db1 = sum(dZ1) / m    
+
+<span class="cm">## UPDATE ##</span>
+W -= lr * dW; b -= lr * db
+</pre>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-why">WHY</span> <code>dZ2 = A2 - y</code> (not a long formula)</h3>
+    <p>Normally you'd have: <code>dLoss/dZ2 = dLoss/dA2 × dA2/dZ2</code>. For BCE loss with sigmoid output, these two derivatives cancel beautifully, leaving just <code>A2 - y</code>. This is why sigmoid+BCE and softmax+CCE are standard pairs — their gradients simplify cleanly.</p>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-trick">TRICK</span> How to Read Matrix Dimensions in Backprop</h3>
+    <table>
+      <tr><th>Variable</th><th>Shape</th><th>Why</th></tr>
+      <tr><td>X</td><td>(m, n_in)</td><td>m samples, n_in features</td></tr>
+      <tr><td>W1</td><td>(n_in, n_hid)</td><td>connects each input to each hidden</td></tr>
+      <tr><td>Z1, A1</td><td>(m, n_hid)</td><td>one activation per sample per neuron</td></tr>
+      <tr><td>dW1 = X.T @ dZ1 / m</td><td>(n_in, n_hid)</td><td>must match W1 shape</td></tr>
+      <tr><td>dA1 = dZ2 @ W2.T</td><td>(m, n_hid)</td><td>must match A1 shape</td></tr>
+    </table>
+    <p>Golden rule: <strong>every gradient must be the same shape as the variable it belongs to</strong>. If dW1 should be (n_in, n_hid), and dZ1 is (m, n_hid), then you need X.T which is (n_in, m) → gives (n_in, n_hid). ✓</p>
+  </div>
+
+  <div class="explain">
+    <h3><span class="tag-trick">OTS SURVIVAL TIPS</span></h3>
+    <ul>
+      <li><strong>Start with the template:</strong> Write <code>__init__</code>, <code>forward</code>, <code>backward</code>, <code>train</code>, <code>predict</code> — in that order always.</li>
+      <li><strong>Always seed:</strong> <code>np.random.seed(42)</code> before weight init for reproducibility.</li>
+      <li><strong>Shape check habit:</strong> If code crashes, print <code>X.shape, W1.shape, Z1.shape</code> — dimensions will reveal the error.</li>
+      <li><strong>Sigmoid output always needs reshape:</strong> <code>y = y.reshape(-1,1)</code> before training.</li>
+      <li><strong>Multiclass needs argmax:</strong> <code>np.argmax(model.forward(X), axis=1)</code> to get predicted class.</li>
+      <li><strong>Regularization = 2 additions only:</strong> Add penalty to loss function, add sign/W term to dW in backward. That's it.</li>
+      <li><strong>Dropout = 1 addition only:</strong> Create mask in forward, apply same mask to dA1 in backward.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /container -->
+</body>
+</html>
